@@ -1,12 +1,13 @@
+(function(){
 var canvas=null, ctx =null,lastPress=null;
-var mousex =0,mousey=0;
+var mousex =0,mousey=0,x=0,y=0;
 function init (){
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
-    y=canvas.height/2;
+    canvas.width=300;
+    canvas.height=200;
     //run and repaint functions
     run();
-    repaint();
     
 }
 //Keydown event
@@ -24,24 +25,48 @@ function run(){
     setTimeout(run,50);
     //console.log('+1')
     act();
+    paint(ctx)
 }
 //repaint
-function repaint(){
-    window.requestAnimationFrame(repaint);
-    paint(ctx);
-}
+// function repaint(){
+//     window.requestAnimationFrame(repaint);
+//     paint(ctx);
+// }
 function paint(ctx){
     ctx.fillStyle='#000';
     ctx.fillRect(0,0,canvas.width,canvas.height)
     ctx.fillStyle='#FFF'
-    ctx.textAlign='center';
     ctx.font='30px sans-serif'
-    ctx.fillText('X: '+mousex,canvas.width/2,y);
-    ctx.fillText('Y: '+mousey,canvas.width/2,y+30);
-    ctx.strokeStyle='#FFF';
-    ctx.lineWidth='5'
-    ctx.strokeRect(mousex-25,mousey-25,50,50);
+    ctx.textAlign='left'
+    ctx.fillText('X: '+x,0,30);
+    ctx.fillText('Y: '+y,0,60);
+    ctx.strokeStyle='#F00';
+    ctx.lineWidth='3';
+    ctx.beginPath();
+    ctx.arc(x,y,20,0,Math.PI*2,true);
+    ctx.stroke();
 }
 function act(){
+    x=mousex
+    y=mousey
+    if(x<0){
+        x=0
+    }
+    if(x > canvas.width){
+        x=canvas.width
+    }
+    if(y<0){
+        y=o;
+    }
+    if(y>canvas.height){
+        y=canvas.height
+    }
 }
 window.addEventListener('load',init,false)
+window.requestAnimationFrame=(function(){
+    return window.requestAnimationFrame ||            
+        window.webkitRequestAnimationFrame ||
+         window.mozRequestAnimationFrame ||
+    function(callback){window.setTimeout(callback,17);};
+    })();
+})();
