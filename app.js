@@ -1,4 +1,5 @@
-var canvas=null, ctx =null;lastPress=null;
+var canvas=null, ctx =null,lastPress=null;
+var mousex =0,mousey=0;
 function init (){
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -9,10 +10,15 @@ function init (){
     
 }
 //Keydown event
-document.addEventListener('keydown',function(evt){
-    lastPress = evt.keyCode;
-},false);
+// document.addEventListener('keydown',function(evt){
+//     lastPress = evt.keyCode;
+// },false);
 
+//Mouse detection
+document.addEventListener('mousemove',function(evt){
+    mousex=evt.pageX-canvas.offsetLeft;
+    mousey=evt.pageY-canvas.offsetTop;
+},false);
 //run
 function run(){
     setTimeout(run,50);
@@ -30,11 +36,12 @@ function paint(ctx){
     ctx.fillStyle='#FFF'
     ctx.textAlign='center';
     ctx.font='30px sans-serif'
-    ctx.fillText('Last press: '+lastPress,canvas.width/2,y);
+    ctx.fillText('X: '+mousex,canvas.width/2,y);
+    ctx.fillText('Y: '+mousey,canvas.width/2,y+30);
+    ctx.strokeStyle='#FFF';
+    ctx.lineWidth='5'
+    ctx.strokeRect(mousex-25,mousey-25,50,50);
 }
 function act(){
-    if(lastPress ===40 ){
-        y=y+10
-    }
 }
 window.addEventListener('load',init,false)
