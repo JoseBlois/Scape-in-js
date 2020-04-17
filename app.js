@@ -3,12 +3,19 @@ var canvas=null, ctx =null,lastPress=null;
 var mousex =0,mousey=0,x=0,y=0;
 var player = new Circle(x,y,15);
 var target = new Circle (100,100,20)
+var score = 0;
+var bgColor=null;
+var img = new Image();
 function init (){
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
     canvas.width=300;
     canvas.height=200;
+    //declaring the images
+    img.src='assets/img.png'
+
     //run and repaint functions
+    enableInputs();
     run();
     
 }
@@ -29,14 +36,23 @@ Circle.prototype.distance=function(circle){
         var dy=this.y-circle.y;
         return(Math.sqrt(dx*dx+dy*dy)-(this.radius+circle.radius));}
     };
+Circle.prototype.drawImage = function (ctx,img){
+    ctx.drawImage(img,this.x-this.radius,this.y-this.radius,this.radius*2,this.radius*2);
+
+}
 //Mouse detection
+function enableInputs(){
 document.addEventListener('mousemove',function(evt){
     mousex=evt.pageX-canvas.offsetLeft;
     mousey=evt.pageY-canvas.offsetTop;
 },false);
+document.addEventListener('mousedown',function(evt){
+    lastPress=evt.which;
+},false);
+}
 //run
 function run(){
-    setTimeout(run,50);
+    window.requestAnimationFrame(run);
     //console.log('+1')
     act();
     paint(ctx)
@@ -51,18 +67,15 @@ function paint(ctx){
     ctx.fillRect(0,0,canvas.width,canvas.height)
     ctx.fillStyle='#FFF'
     ctx.textAlign='left'
-    ctx.fillText('X: '+player.x,0,20);
-    ctx.fillText('Y: '+player.y,0,30);
+    // ctx.fillText('X: '+player.x,0,20);
+    // ctx.fillText('Y: '+player.y,0,30);
     ctx.fillText('Distance: '+player.distance(target).toFixed(1),0,10)
-    ctx.strokeStyle='#F00';
-    if(target.distance(player)<=0){
-        ctx.strokeStyle='#0f0'
-        if(target.x == player.x && target.y ===player.y){
-            ctx.strokeStyle='#f0f'
-        }
-    }
+    ctx.fillText('Lastpress: '+lastPress,0,40);
+    ctx.fillText('Score: '+score,0,20)
+    lastPress=null;
+    ctx.strokeStyle=bgColor;
     player.draw(ctx);
-    target.draw(ctx)
+    target.drawImage(ctx,img)
 }
 function act(){
     player.x=mousex;
@@ -79,6 +92,19 @@ function act(){
     if(player.y>canvas.height){
         player.y=canvas.height
     }
+    if(lastPress===1){
+        bgColor ='#F00';
+        if(player.distance(target)<0){
+            score++;
+            target.x= random(canvas.width/10)*10+target.radius;
+            target.y= random(canvas.height/10)*10+target.radius;
+        }
+    }else{
+        bgColor='#0f0'
+    }
+}
+function random(max){
+    return ~~(Math.random()*max);
 }
 window.addEventListener('load',init,false)
 window.requestAnimationFrame=(function(){
