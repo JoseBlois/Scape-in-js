@@ -1,6 +1,8 @@
 (function(){
 var canvas=null, ctx =null,lastPress=null;
 var mousex =0,mousey=0,x=0,y=0;
+var player = new Circle(x,y,15);
+var target = new Circle (100,100,20)
 function init (){
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -10,11 +12,23 @@ function init (){
     run();
     
 }
-//Keydown event
-// document.addEventListener('keydown',function(evt){
-//     lastPress = evt.keyCode;
-// },false);
-
+//function Circle
+function Circle(x,y,radius){
+    this.x = (x === null)?0:x;
+    this.y = (y === null)?0:y;
+    this.radius = (radius ===null)?0:radius;
+}
+Circle.prototype.draw = function(ctx){
+    ctx.beginPath()
+    ctx.arc(this.x,this.y,this.radius,0,Math.PI*2,true);
+    ctx.stroke();
+}
+Circle.prototype.distance=function(circle){
+    if(circle!=null){
+        var dx=this.x-circle.x;
+        var dy=this.y-circle.y;
+        return(Math.sqrt(dx*dx+dy*dy)-(this.radius+circle.radius));}
+    };
 //Mouse detection
 document.addEventListener('mousemove',function(evt){
     mousex=evt.pageX-canvas.offsetLeft;
@@ -36,30 +50,34 @@ function paint(ctx){
     ctx.fillStyle='#000';
     ctx.fillRect(0,0,canvas.width,canvas.height)
     ctx.fillStyle='#FFF'
-    ctx.font='30px sans-serif'
     ctx.textAlign='left'
-    ctx.fillText('X: '+x,0,30);
-    ctx.fillText('Y: '+y,0,60);
+    ctx.fillText('X: '+player.x,0,20);
+    ctx.fillText('Y: '+player.y,0,30);
+    ctx.fillText('Distance: '+player.distance(target).toFixed(1),0,10)
     ctx.strokeStyle='#F00';
-    ctx.lineWidth='3';
-    ctx.beginPath();
-    ctx.arc(x,y,20,0,Math.PI*2,true);
-    ctx.stroke();
+    if(target.distance(player)<=0){
+        ctx.strokeStyle='#0f0'
+        if(target.x == player.x && target.y ===player.y){
+            ctx.strokeStyle='#f0f'
+        }
+    }
+    player.draw(ctx);
+    target.draw(ctx)
 }
 function act(){
-    x=mousex
-    y=mousey
-    if(x<0){
-        x=0
+    player.x=mousex;
+    player.y=mousey;
+    if(player.x<0){
+        player.x=0
     }
-    if(x > canvas.width){
-        x=canvas.width
+    if(player.x > canvas.width){
+        player.x=canvas.width
     }
-    if(y<0){
-        y=o;
+    if(player.y<0){
+        player.y=0;
     }
-    if(y>canvas.height){
-        y=canvas.height
+    if(player.y>canvas.height){
+        player.y=canvas.height
     }
 }
 window.addEventListener('load',init,false)
