@@ -1,5 +1,5 @@
 (function(){
-// var canvas=null, ctx =null,lastPress=null;
+var canvas=null, ctx =null,lastPress=null;
 var mousex =0,mousey=0,x=0,y=0;
 var player = new Circle(x,y,15);
 // var target = new Circle (100,100,20)
@@ -13,6 +13,7 @@ var gameover=true;
 var eTimer=0;
 // var speed =10;
 var bombs=[];
+var flare=null;
 function reset(){
     score=0;
     eTimer=0;
@@ -24,11 +25,15 @@ function init (){
     ctx = canvas.getContext('2d');
     canvas.width=300;
     canvas.height=200;
-    canvas.addEventListener('mousedown',function(){
+    canvas.addEventListener('mousedown',function(evt){
+        lastPress=evt.which
+        if(lastPress===1){
         pause=!pause;
+    }
     },false);
     //declaring the images
     // img.src='assets/img.png'
+    flare = new Circle(canvas.width+50,canvas.height+50,50);
     //run and repaint functions
     enableInputs();
     run();
@@ -111,6 +116,8 @@ function paint(ctx){
     // ctx.fillText('Y: '+player.y,0,30);
     ctx.strokeStyle=bgColor;
     player.draw(ctx);
+    ctx.strokeStyle='#F0F'
+    flare.draw(ctx)
     // target.drawImage(ctx,img)
     ctx.lineWidth='5';
     ctx.strokeStyle='#fff'
@@ -159,7 +166,7 @@ function act(deltaTime){
             eTimer=0.5+random(2.5);
         }
         for(var i = 0 ,l= bombs.length-1; i < l;i++){
-            if(bombs[i].timer < 0){
+            if(bombs[i].timer < 0 || (bombs[i].distance(flare)<0)){
                 score++;
                 bombs.splice(i--,1)
                 l--;
@@ -192,6 +199,19 @@ function act(deltaTime){
         if(player.y>canvas.height){
         player.y=canvas.height
         }
+        if(flare.timer<0){
+            if (lastPress===2){
+                flare.x=player.x;
+                flare.y=player.y;
+                flare.timer=5;
+                lastPress=null
+            }
+        }else flare.timer-= deltaTime;
+        if(flare.timer<3){
+            flare.x=canvas.width+flare.radius;
+            flare.Y=canvas.height+flare.radius;
+        }
+        lastPress=null;
     }
         // if(target.distance(player)>0){
         //     var angle = target.getAngle(player);
